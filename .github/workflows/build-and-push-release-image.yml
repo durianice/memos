@@ -1,6 +1,11 @@
 name: build-and-push-release-image
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., v1.0.0)'
+        required: true
   push:
     tags:
       # Run on pushing tags like 'v1.0.0'
@@ -25,7 +30,12 @@ jobs:
         # Extract version from tag name
         # Example: tag name `v1.0.0` sets up env.VERSION=1.0.0
         run: |
-          echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          fi
+          echo "GITHUB_ENV $GITHUB_ENV"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
