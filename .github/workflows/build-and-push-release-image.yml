@@ -7,12 +7,9 @@ on:
         description: 'Version number (e.g., v1.0.0)'
         required: true
   push:
-    tags:
-      # Run on pushing tags like 'v1.0.0'
-      - "v*.*.*"
     branches:
-      # Run on pushing branches like 'v1.0.0'
-      - "v*.*.*"
+      # Run on pushing branches like 'v1.0.0', 'v0.22.2rc'
+      - "v*"
 
 jobs:
   build-and-push-release-image:
@@ -64,9 +61,7 @@ jobs:
             durianice/memos
             ghcr.io/durianice/memos
           tags: |
-            type=semver,pattern={{version}},value=${{ env.VERSION }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ env.VERSION }}
-            ${{ startsWith(github.ref, 'refs/tags/') && 'type=raw,value=stable' }}
+            type=raw,value=${{ env.VERSION }}
           flavor: |
             latest=true
           labels: |

@@ -16,6 +16,7 @@ import { isSuperUser } from "@/utils/user";
 import MemoActionMenu from "./MemoActionMenu";
 import MemoContent from "./MemoContent";
 import MemoEditor from "./MemoEditor";
+import MemoLocationView from "./MemoLocationView";
 import MemoReactionistView from "./MemoReactionListView";
 import MemoRelationListView from "./MemoRelationListView";
 import MemoResourceListView from "./MemoResourceListView";
@@ -51,7 +52,7 @@ const MemoView: React.FC<Props> = (props: Props) => {
   const memoContainerRef = useRef<HTMLDivElement>(null);
   const referencedMemos = memo.relations.filter((relation) => relation.type === MemoRelation_Type.REFERENCE);
   const commentAmount = memo.relations.filter(
-    (relation) => relation.type === MemoRelation_Type.COMMENT && relation.relatedMemo === memo.name,
+    (relation) => relation.type === MemoRelation_Type.COMMENT && relation.relatedMemo?.name === memo.name,
   ).length;
   const relativeTimeFormat = Date.now() - memo.displayTime!.getTime() > 1000 * 60 * 60 * 24 ? "datetime" : "auto";
   const readonly = memo.creator !== user?.name && !isSuperUser(user);
@@ -95,7 +96,7 @@ const MemoView: React.FC<Props> = (props: Props) => {
     props.displayTimeFormat === "time" ? (
       memo.displayTime?.toLocaleTimeString()
     ) : (
-      <relative-time datetime={memo.displayTime?.toISOString()} format={relativeTimeFormat} tense="past"></relative-time>
+      <relative-time datetime={memo.displayTime?.toISOString()} format={relativeTimeFormat}></relative-time>
     );
 
   return (
@@ -198,6 +199,7 @@ const MemoView: React.FC<Props> = (props: Props) => {
             onDoubleClick={handleMemoContentDoubleClick}
             compact={props.compact && workspaceMemoRelatedSetting.enableAutoCompact}
           />
+          {memo.location && <MemoLocationView location={memo.location} />}
           <MemoResourceListView resources={memo.resources} />
           <MemoRelationListView memo={memo} relations={referencedMemos} />
           <MemoReactionistView memo={memo} reactions={memo.reactions} />

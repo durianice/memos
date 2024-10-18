@@ -3,7 +3,12 @@ name: Proto linter
 on:
   workflow_dispatch:
   push:
-    branches: [deploy]
+    branches: [main]
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "proto/**"
 
 jobs:
   lint-protos:
@@ -24,6 +29,6 @@ jobs:
       - name: buf format
         run: |
           if [[ $(buf format -d) ]]; then
-            echo "Run 'buf format -w'"
+            echo "Run 'buf format -d'"
             exit 1
           fi
